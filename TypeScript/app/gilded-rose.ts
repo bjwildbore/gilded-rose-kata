@@ -14,6 +14,7 @@ export enum ItemTypes {
   AGED_BRIE = 'Aged Brie',
   BACKSTAGE = 'Backstage passes to a TAFKAL80ETC concert',
   SULFURAS = 'Sulfuras, Hand of Ragnaros',
+  CONJURED = 'Conjured Mana Cake',
 }
 
 export class GildedRose {
@@ -53,6 +54,10 @@ export class GildedRose {
 
         case ItemTypes.AGED_BRIE:
           qualityAdjustment = 1 // these increase
+          break
+
+        case ItemTypes.CONJURED:
+          qualityAdjustment = -2
           break
       }
 

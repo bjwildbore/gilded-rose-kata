@@ -1,4 +1,4 @@
-import { Item, GildedRose } from '@/gilded-rose'
+import { Item, GildedRose, ItemTypes } from '@/gilded-rose'
 
 // test helper function to run the update function a specified number of times
 function runMultiple(items: Array<Item>, days: number) {
@@ -38,7 +38,7 @@ describe('normal items', () => {
 
 describe('aged bries', () => {
   test('should increase in quality', () => {
-    let items = [new Item('Aged Brie', 3, 3)]
+    let items = [new Item(ItemTypes.AGED_BRIE, 3, 3)]
     items = runMultiple(items, 1)
 
     expect(items[0].sellIn).toBe(2)
@@ -46,7 +46,7 @@ describe('aged bries', () => {
   })
 
   test('should increase in quality multiple days', () => {
-    let items = [new Item('Aged Brie', 3, 3)]
+    let items = [new Item(ItemTypes.AGED_BRIE, 3, 3)]
     items = runMultiple(items, 2)
 
     expect(items[0].sellIn).toBe(1)
@@ -54,7 +54,7 @@ describe('aged bries', () => {
   })
 
   test('should increase in quality past sellIn time', () => {
-    let items = [new Item('Aged Brie', 3, 3)]
+    let items = [new Item(ItemTypes.AGED_BRIE, 3, 3)]
     items = runMultiple(items, 5)
 
     expect(items[0].sellIn).toBe(-2)
@@ -62,7 +62,7 @@ describe('aged bries', () => {
   })
 
   test('should not increase in quality past 50', () => {
-    let items = [new Item('Aged Brie', 3, 49)]
+    let items = [new Item(ItemTypes.AGED_BRIE, 3, 49)]
     items = runMultiple(items, 5)
 
     expect(items[0].quality).toBe(50)
@@ -71,7 +71,7 @@ describe('aged bries', () => {
 
 describe('sulfuras items', () => {
   test('should not change', () => {
-    let items = [new Item('Sulfuras, Hand of Ragnaros', 22, 80)]
+    let items = [new Item(ItemTypes.SULFURAS, 22, 80)]
     items = runMultiple(items, 1)
 
     expect(items[0].sellIn).toBe(22)
@@ -79,7 +79,7 @@ describe('sulfuras items', () => {
   })
 
   test('should not change over multiple days', () => {
-    let items = [new Item('Sulfuras, Hand of Ragnaros', 22, 80)]
+    let items = [new Item(ItemTypes.SULFURAS, 22, 80)]
     items = runMultiple(items, 5)
 
     expect(items[0].sellIn).toBe(22)
@@ -87,7 +87,7 @@ describe('sulfuras items', () => {
   })
 
   test('should always have quality 80', () => {
-    let items = [new Item('Sulfuras, Hand of Ragnaros', 22, 10)]
+    let items = [new Item(ItemTypes.SULFURAS, 22, 10)]
     items = runMultiple(items, 5)
 
     expect(items[0].sellIn).toBe(22)
@@ -99,7 +99,7 @@ describe('sulfuras items', () => {
 //and by 3 when there are 5 days or less but Quality drops to 0 after the concert
 describe('backstage passes tests', () => {
   test('should increase quality', () => {
-    let items = [new Item('Backstage passes to a TAFKAL80ETC concert', 20, 10)]
+    let items = [new Item(ItemTypes.BACKSTAGE, 20, 10)]
     items = runMultiple(items, 1)
 
     expect(items[0].sellIn).toBe(19)
@@ -107,7 +107,7 @@ describe('backstage passes tests', () => {
   })
 
   test('should increase quality multiple days', () => {
-    let items = [new Item('Backstage passes to a TAFKAL80ETC concert', 20, 15)]
+    let items = [new Item(ItemTypes.BACKSTAGE, 20, 15)]
     items = runMultiple(items, 5)
 
     expect(items[0].sellIn).toBe(15)
@@ -115,29 +115,47 @@ describe('backstage passes tests', () => {
   })
 
   test('should increase in quality by 2 within 10 days', () => {
-    let items = [new Item('Backstage passes to a TAFKAL80ETC concert', 10, 10)]
+    let items = [new Item(ItemTypes.BACKSTAGE, 10, 10)]
     items = runMultiple(items, 1)
 
     expect(items[0].quality).toBe(12)
   })
 
   test('should increase in quality by 3 within 5 days', () => {
-    let items = [new Item('Backstage passes to a TAFKAL80ETC concert', 4, 10)]
+    let items = [new Item(ItemTypes.BACKSTAGE, 4, 10)]
     items = runMultiple(items, 1)
 
     expect(items[0].quality).toBe(13)
   })
 
   test('should have quality of 0 when sellIn is past', () => {
-    let items = [new Item('Backstage passes to a TAFKAL80ETC concert', 0, 10)]
+    let items = [new Item(ItemTypes.BACKSTAGE, 0, 10)]
     items = runMultiple(items, 1)
 
     expect(items[0].quality).toBe(0)
   })
 
   test('quality should not exceed 50', () => {
-    let items = [new Item('Backstage passes to a TAFKAL80ETC concert', 3, 49)]
+    let items = [new Item(ItemTypes.BACKSTAGE, 3, 49)]
     items = runMultiple(items, 3)
     expect(items[0].quality).toBe(50)
+  })
+})
+
+describe('Conjured items', () => {
+  test('should decrease at 2x rate', () => {
+    let items = [new Item(ItemTypes.CONJURED, 10, 20)]
+    items = runMultiple(items, 1)
+
+    expect(items[0].sellIn).toBe(9)
+    expect(items[0].quality).toBe(18)
+  })
+
+  test('should decrease 2x rate over multiple days', () => {
+    let items = [new Item(ItemTypes.CONJURED, 10, 20)]
+    items = runMultiple(items, 5)
+
+    expect(items[0].sellIn).toBe(5)
+    expect(items[0].quality).toBe(10)
   })
 })
