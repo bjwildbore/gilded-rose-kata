@@ -85,6 +85,14 @@ describe('sulfuras items', () => {
     expect(items[0].sellIn).toBe(22)
     expect(items[0].quality).toBe(80)
   })
+
+  test('should always have quality 80', () => {
+    let items = [new Item('Sulfuras, Hand of Ragnaros', 22, 10)]
+    items = runMultiple(items, 5)
+
+    expect(items[0].sellIn).toBe(22)
+    expect(items[0].quality).toBe(80)
+  })
 })
 
 //Quality increases by 2 when there are 10 days or less
