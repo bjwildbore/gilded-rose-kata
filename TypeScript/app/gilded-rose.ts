@@ -1,69 +1,86 @@
 export class Item {
-  name: string;
-  sellIn: number;
-  quality: number;
+  name: string
+  sellIn: number
+  quality: number
 
   constructor(name, sellIn, quality) {
-    this.name = name;
-    this.sellIn = sellIn;
-    this.quality = quality;
+    this.name = name
+    this.sellIn = sellIn
+    this.quality = quality
   }
 }
 
+export enum ItemTypes {
+  AGED_BRIE = 'Aged Brie',
+  BACKSTAGE = 'Backstage passes to a TAFKAL80ETC concert',
+  SULFURAS = 'Sulfuras, Hand of Ragnaros',
+  CONJURED = 'Conjured Mana Cake',
+}
+
 export class GildedRose {
-  items: Array<Item>;
+  items: Array<Item>
 
   constructor(items = [] as Array<Item>) {
-    this.items = items;
+    this.items = items
   }
 
   updateQuality() {
-    for (let i = 0; i < this.items.length; i++) {
-      if (this.items[i].name != 'Aged Brie' && this.items[i].name != 'Backstage passes to a TAFKAL80ETC concert') {
-        if (this.items[i].quality > 0) {
-          if (this.items[i].name != 'Sulfuras, Hand of Ragnaros') {
-            this.items[i].quality = this.items[i].quality - 1
-          }
-        }
-      } else {
-        if (this.items[i].quality < 50) {
-          this.items[i].quality = this.items[i].quality + 1
-          if (this.items[i].name == 'Backstage passes to a TAFKAL80ETC concert') {
-            if (this.items[i].sellIn < 11) {
-              if (this.items[i].quality < 50) {
-                this.items[i].quality = this.items[i].quality + 1
-              }
-            }
-            if (this.items[i].sellIn < 6) {
-              if (this.items[i].quality < 50) {
-                this.items[i].quality = this.items[i].quality + 1
-              }
-            }
-          }
-        }
-      }
-      if (this.items[i].name != 'Sulfuras, Hand of Ragnaros') {
-        this.items[i].sellIn = this.items[i].sellIn - 1;
-      }
-      if (this.items[i].sellIn < 0) {
-        if (this.items[i].name != 'Aged Brie') {
-          if (this.items[i].name != 'Backstage passes to a TAFKAL80ETC concert') {
-            if (this.items[i].quality > 0) {
-              if (this.items[i].name != 'Sulfuras, Hand of Ragnaros') {
-                this.items[i].quality = this.items[i].quality - 1
-              }
-            }
-          } else {
-            this.items[i].quality = this.items[i].quality - this.items[i].quality
-          }
-        } else {
-          if (this.items[i].quality < 50) {
-            this.items[i].quality = this.items[i].quality + 1
-          }
-        }
-      }
-    }
+    this.items.forEach((item) => {
+      // normal items decrease in quality and sell
+      let sellAdjustment = -1 // sell adjustment usually decreases except for sulfuras
+      let qualityAdjustment = -1 // the adjustment differs depending on the type of item
 
-    return this.items;
+      let canAdjustQuality = true
+      let canAdjustSellIn = true
+
+      switch (item.name) {
+        case ItemTypes.BACKSTAGE:
+          qualityAdjustment = 1 // these items increase
+
+          if (item.sellIn == 0) {
+            qualityAdjustment = 0 - item.quality
+          } else if (item.sellIn <= 5) {
+            qualityAdjustment = 3
+          } else if (item.sellIn <= 10) {
+            qualityAdjustment = 2
+          }
+          break
+
+        case ItemTypes.SULFURAS:
+          item.quality = 80 // adding in here, mentioned in reqs but missing from original implementation
+          canAdjustQuality = false
+          canAdjustSellIn = false
+          break
+
+        case ItemTypes.AGED_BRIE:
+          qualityAdjustment = 1 // these increase
+          break
+
+        case ItemTypes.CONJURED:
+          qualityAdjustment = -2
+          break
+      }
+
+      if (item.sellIn <= 0) {
+        qualityAdjustment = qualityAdjustment * 2
+      }
+
+      // modify the items sellIn and qualities
+      if (canAdjustSellIn) {
+        item.sellIn += sellAdjustment
+      }
+
+      // quality rules that apply to all items
+      if (canAdjustQuality) {
+        item.quality += qualityAdjustment
+
+        if (item.quality > 50) {
+          item.quality = 50
+        } else if (item.quality < 0) {
+          item.quality = 0
+        }
+      }
+    })
+    return this.items
   }
 }
